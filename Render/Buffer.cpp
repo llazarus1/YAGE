@@ -69,17 +69,20 @@ Buffer::~Buffer() {
     glDeleteBuffers(1, &_handle);
 }
 
-void *Buffer::mapBuffer(GLenum accessType) {
+void *Buffer::mapBufferData(GLenum accessType) {
     return glMapBuffer(_handle, accessType);
 }
 
-bool Buffer::unmapBuffer() {
+bool Buffer::unmapBufferData() {
     return glUnmapBuffer(_handle);
 }
 
 void Buffer::setData(void *data, int elementCount) {
-    resize(elementCount, false);
-    glBufferSubData(_handle, 0, elementCount, data);
+    if (elementCount) {
+        resize(elementCount, false);
+    }
+
+    glBufferSubData(_handle, 0, _elementCount, data);
 }
 
 void Buffer::resize(int elementCount, bool saveData) {
@@ -90,7 +93,7 @@ void Buffer::resize(int elementCount, bool saveData) {
 }
 
 void Buffer::reserve(int elementCapacity, bool saveData) {
-    int oldHandle = _handle;
+    unsigned int oldHandle = _handle;
     void *data = NULL;
 
     if (saveData) {

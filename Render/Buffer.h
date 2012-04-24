@@ -29,7 +29,7 @@ public:
 
     virtual ~Buffer();
 
-    void setData(void *data);
+    void setData(void *data, int elementCount = 0);
 
     void *mapBufferData(GLenum accessType);
 
