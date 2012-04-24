@@ -7,6 +7,7 @@
  *
  */
 
+#include <Base/Assertion.h>
 #include "Buffer.h"
 
 #include "VertexArray.h"
@@ -59,11 +60,49 @@ unsigned int VertexArray::getElementCount() const {
     return 0;
 }
 
+unsigned int VertexArray::getElementCapacity() const {
+    if (getAttributeCount() == 0) { return 0; }
+    if (_positions)      { return  _positions->getElementCapacity(); }
+    if (_normals)        { return    _normals->getElementCapacity(); }
+    if (_buffers.size()) { return _buffers[0]->getElementCapacity(); }
+
+    for (int i = 0; i < _texCoords.size(); i++) {
+        if (_texCoords[i]) { return _texCoords[i]->getElementCapacity(); }
+    }
+
+    return 0;
+}
+
 unsigned int VertexArray::getAttributeCount() const {
     return _buffers.size() + _texCoords.size() + (_positions ? 1 : 0) + (_normals ? 1 : 0);
 }
 
+void VertexArray::resize(int elementCount, bool saveData) {
+    if (_positions) { _positions->resize(elementCount, saveData); }
+    if (_normals) { _normals->resize(elementCount, saveData); }
+    for (int i = 0; i < _texCoords.size(); i++) {
+        if (_texCoords[i]) { _texCoords[i]->resize(elementCount, saveData); }
+    }
+    for (int i = 0; i < _buffers.size(); i++) {
+        if (_buffers[i]) { _buffers[i]->resize(elementCount, saveData); }
+    }
+}
+
+void VertexArray::reserve(int elementCapacity, bool saveData) {
+    if (_positions) { _positions->reserve(elementCapacity, saveData); }
+    if (_normals) { _normals->reserve(elementCapacity, saveData); }
+    for (int i = 0; i < _texCoords.size(); i++) {
+        if (_texCoords[i]) { _texCoords[i]->reserve(elementCapacity, saveData); }
+    }
+    for (int i = 0; i < _buffers.size(); i++) {
+        if (_buffers[i]) { _buffers[i]->reserve(elementCapacity, saveData); }
+    }
+}
+
 unsigned int VertexArray::addGenericAttributeBuffer(const std::string &name, GenericAttributeBuffer *buffer) {
+    ASSERT(getElementCapacity() == 0 || getElementCapacity() == buffer->getElementCapacity());
+    ASSERT(getElementCount() == 0 || getElementCount() == buffer->getElementCount());
+
     _buffers.push_back(buffer);
     _names.push_back(name);
 
@@ -90,6 +129,8 @@ const VertexArrayLayout & VertexArray::getVertexArrayLayout() const {
 }
 
 void VertexArray::setPositionBuffer(PositionBuffer *buffer) {
+    ASSERT(getElementCapacity() == 0 || getElementCapacity() == buffer->getElementCapacity());
+    ASSERT(getElementCount() == 0 || getElementCount() == buffer->getElementCount());
     _positions = buffer;
 }
 
@@ -98,6 +139,8 @@ PositionBuffer * VertexArray::getPositionBuffer() {
 }
 
 void VertexArray::setNormalBuffer(NormalBuffer *buffer) {
+    ASSERT(getElementCapacity() == 0 || getElementCapacity() == buffer->getElementCapacity());
+    ASSERT(getElementCount() == 0 || getElementCount() == buffer->getElementCount());
     _normals = buffer;
 }
 
@@ -106,6 +149,8 @@ NormalBuffer * VertexArray::getNormalBuffer() {
 }
 
 void VertexArray::setTexCoordBuffer(int index, TexCoordBuffer *buffer) {
+    ASSERT(getElementCapacity() == 0 || getElementCapacity() == buffer->getElementCapacity());
+    ASSERT(getElementCount() == 0 || getElementCount() == buffer->getElementCount());
     _texCoords[index] = buffer;
 }
 

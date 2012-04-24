@@ -26,14 +26,14 @@ IndexBuffer::IndexBuffer(
 {}
 
 void IndexBuffer::render(PrimitiveType type) {
-    if (_handle) { glBindBuffer(_bufferType, _handle); }
+    glBindBuffer(_bufferType, _handle);
 
     glDrawElements(
         TranslatePrimitiveType(type),
         getElementCount(),
         getDataType(),
-        _handle ? 0 : _data
+        0
     );
 
-    if (_handle) { glBindBuffer(_bufferType, 0); }
+    glBindBuffer(_bufferType, 0);
 }

@@ -24,10 +24,20 @@ public:
         GLenum dataType,
         unsigned int elementSize,
         unsigned int elementCount,
-        void *data
+        void *data = NULL
     );
 
     virtual ~Buffer();
+
+    void setData(void *data);
+
+    void *mapBufferData(GLenum accessType);
+
+    bool unmapBufferData();
+
+    void resize(int elementCount, bool saveData);
+
+    void reserve(int elementCapacity, bool saveData);
 
     GLenum getAccessType();
 
@@ -35,13 +45,8 @@ public:
 
     unsigned int getElementCount();
 
-    unsigned int getByteCount();
+    unsigned int getElementCapacity();
 
-    template <typename T>
-    T * getData() {
-        return static_cast<T*>(_data);
-    }
-    
 protected:
     /*! Specifies the type of the buffer. */
     GLenum _bufferType;
@@ -54,19 +59,25 @@ protected:
     GLenum _dataType;
 
     /*! The number of components per element. Must be either 1, 2, 3, or 4. */
-    unsigned int _elementSize;
+    unsigned int _componentsPerElement;
 
     /*! The number of elements in the buffer. */
     unsigned int _elementCount;
 
-    /*! A sysmem copy of the data. */
-    void *_data;
+    /*! The number of elements the buffer can hold. */
+    unsigned int _elementCapacity;
+
+    /*! The number of bytes in each element component. */
+    unsigned int _bytesPerComponent;
 
     /*! The unique identifier for the buffer. */
     GLuint _handle;
 
     /*! The number of bytes in the buffer. */
     unsigned int _byteCount;
+
+private:
+    void allocate(int elementCapacity, void *data);
 
 };
 

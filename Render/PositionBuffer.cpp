@@ -27,22 +27,15 @@ PositionBuffer::PositionBuffer(
 {}
 
 void PositionBuffer::enable() {
-    if (_handle) {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glBindBuffer(_bufferType, _handle);
-    }
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glBindBuffer(_bufferType, _handle);
 
-    glVertexPointer(_elementSize, _dataType, 0, _handle ? 0 : _data);
+    glVertexPointer(_componentsPerElement, _dataType, 0, 0);
 
-    if (_handle) {
-        glBindBuffer(_bufferType, 0);
-    }
+    glBindBuffer(_bufferType, 0);
 }
 
 void PositionBuffer::disable() {
-    if (_handle) {
-        glDisableClientState(GL_VERTEX_ARRAY);
-    }
-
+    glDisableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(4, GL_FLOAT, 0, 0);
 }

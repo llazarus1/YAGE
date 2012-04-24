@@ -26,22 +26,15 @@ NormalBuffer::NormalBuffer(
 {}
 
 void NormalBuffer::enable() {
-    if (_handle) {
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(_bufferType, _handle);
-    }
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glBindBuffer(_bufferType, _handle);
 
-    glNormalPointer(_dataType, 0, _handle ? 0 : _data);
+    glNormalPointer(_dataType, 0, 0);
 
-    if (_handle) {
-        glBindBuffer(_bufferType, 0);
-    }
+    glBindBuffer(_bufferType, 0);
 }
 
 void NormalBuffer::disable() {
-    if (_handle) {
-        glDisableClientState(GL_NORMAL_ARRAY);
-    }
-
+    glDisableClientState(GL_NORMAL_ARRAY);
     glNormalPointer(GL_FLOAT, 0, 0);
 }

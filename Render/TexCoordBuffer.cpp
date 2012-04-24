@@ -34,16 +34,12 @@ void TexCoordBuffer::enable(int channel) {
 
     glClientActiveTexture(GL_TEXTURE0 + _activeChannel);
 
-    if (_handle) {
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glBindBuffer(_bufferType, _handle);
-    }
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glBindBuffer(_bufferType, _handle);
 
-    glTexCoordPointer(_elementSize, _dataType, 0, _handle ? 0 : _data);
+    glTexCoordPointer(_componentsPerElement, _dataType, 0, 0);
 
-    if (_handle) {
-        glBindBuffer(_bufferType, 0);
-    }
+    glBindBuffer(_bufferType, 0);
 }
 
 void TexCoordBuffer::disable() {
@@ -51,9 +47,7 @@ void TexCoordBuffer::disable() {
 
     glClientActiveTexture(GL_TEXTURE0 + _activeChannel);
 
-    if (_handle) {
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    }
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
     glTexCoordPointer(4, GL_FLOAT, 0, 0);
 

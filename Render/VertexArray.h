@@ -48,12 +48,26 @@ public:
     /*! Deletes all of the underlying buffers. */
     void deleteAllBuffers();
 
-    /*! Gets the number of vertices in the VertexArray. All child GenericAttributeBuffers must
-     *  have the same number of elements to be valid. */
+    /*! Gets the number of vertices in the VertexArray. All child Buffers must have the
+     *  same number of elements to be valid. */
     unsigned int getElementCount() const;
+
+    /*! Gets the number of vertices the VertexArray has space allocated to hold. All child
+    *   Buffers must have the same capacity to be valid. */
+    unsigned int getElementCapacity() const;
 
     /*! Get the number of GenericAttributeBuffers in the VertexArray */
     unsigned int getAttributeCount() const;
+
+    /*! Resizes all internal buffers. This may or may not result in reallocation and will
+     *  destroy all old data unless saveData is set to true. */
+    void resize(int elementCount, bool saveData);
+
+    /*! Sets the reserved space on all underlying buffers. This actually changes the size
+     *  of every buffer's allocation, but will only affect the element count if the new
+     *  capacity is not large enough to contain all elements. This destorys all buffer
+     *  data unless saveData is set to true. */
+    void reserve(int elementCapacity, bool saveData);
 
     /*! Sets the position buffer for this VertexArray. The generic addGenericAttributeBuffer
      *  function may be used for this, but this function allows access to the data using

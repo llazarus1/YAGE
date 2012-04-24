@@ -160,9 +160,9 @@ void RenderContext::render(const Matrix &view, const Matrix &projection, Rendera
                 active->disable();
             }
 
-            (*itr)->getMaterial()->enable();
-
             active = (*itr)->getMaterial();
+
+            active->enable();
 
             newlyActive = true;
         }

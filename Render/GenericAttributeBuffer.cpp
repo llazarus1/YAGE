@@ -30,15 +30,14 @@ GenericAttributeBuffer::GenericAttributeBuffer(
 
 void GenericAttributeBuffer::enable(int channel) {
     ASSERT(_activeChannel == -1);
+
     _activeChannel = channel;
 
     glEnableVertexAttribArray(_activeChannel);
 
-    if (_handle) {
-        glBindBuffer(_bufferType, _handle);
-    }
+    glBindBuffer(_bufferType, _handle);
 
-    glVertexAttribPointer(_activeChannel, _elementSize, _dataType, GL_FALSE, 0, _handle ? 0 : _data);
+    glVertexAttribPointer(_activeChannel, _componentsPerElement, _dataType, GL_FALSE, 0, 0);
 }
 
 void GenericAttributeBuffer::disable() {
