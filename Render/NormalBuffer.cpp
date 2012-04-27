@@ -7,6 +7,7 @@
  *
  */
 
+#include <Base/Assertion.h>
 #include "NormalBuffer.h"
 
 NormalBuffer::NormalBuffer(
@@ -25,7 +26,21 @@ NormalBuffer::NormalBuffer(
     )
 {}
 
+NormalBuffer::NormalBuffer(
+    GLenum accessType,
+    GLenum dataType
+):
+    Buffer(
+        GL_ARRAY_BUFFER,
+        accessType,
+        dataType,
+        3
+    )
+{}
+
 void NormalBuffer::enable() {
+    ASSERT(_handle);
+
     glEnableClientState(GL_NORMAL_ARRAY);
     glBindBuffer(_bufferType, _handle);
 
@@ -35,6 +50,8 @@ void NormalBuffer::enable() {
 }
 
 void NormalBuffer::disable() {
+    ASSERT(_handle);
+
     glDisableClientState(GL_NORMAL_ARRAY);
     glNormalPointer(GL_FLOAT, 0, 0);
 }

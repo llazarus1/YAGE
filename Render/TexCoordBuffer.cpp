@@ -28,8 +28,24 @@ TexCoordBuffer::TexCoordBuffer(
     _activeChannel(-1)
 {}
 
+TexCoordBuffer::TexCoordBuffer(
+    GLenum accessType,
+    GLenum dataType,
+    unsigned int elementSize
+):
+    Buffer(
+        GL_ARRAY_BUFFER,
+        accessType,
+        dataType,
+        elementSize
+    ),
+    _activeChannel(-1)
+{}
+
 void TexCoordBuffer::enable(int channel) {
     ASSERT(_activeChannel == -1);
+    ASSERT(_handle);
+
     _activeChannel = channel;
 
     glClientActiveTexture(GL_TEXTURE0 + _activeChannel);
@@ -44,6 +60,7 @@ void TexCoordBuffer::enable(int channel) {
 
 void TexCoordBuffer::disable() {
     ASSERT(_activeChannel != -1);
+    ASSERT(_handle);
 
     glClientActiveTexture(GL_TEXTURE0 + _activeChannel);
 

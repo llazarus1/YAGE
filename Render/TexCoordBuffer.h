@@ -21,6 +21,12 @@ public:
         void *data
     );
 
+    TexCoordBuffer(
+        GLenum accessType,
+        GLenum dataType,
+        unsigned int elementSize
+    );
+
     void enable(int channel);
 
     void disable();
