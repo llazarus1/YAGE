@@ -21,6 +21,12 @@ public:
         void *data
     );
 
+    PositionBuffer(
+        GLenum accessType,
+        GLenum dataType,
+        unsigned int elementSize
+    );
+
     void enable();
 
     void disable();

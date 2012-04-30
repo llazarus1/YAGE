@@ -118,13 +118,15 @@ SceneNode * SceneManager::genericRemoveNode(const std::string &name, const std::
         THROW(ItemNotFoundError, "Attempting to remove a node that does not exist: " << name);
     }
 
-    if (itr->second->getType() != type) {
+    SceneNode *node = itr->second;
+
+    if (node->getType() != type) {
         THROW(TypeMismatchError, "Types do not match: " <<
-            itr->second->getType() << " != " << type);
+            node->getType() << " != " << type);
     }
 
     _nodeMap.erase(itr);
-    return itr->second;
+    return node;
 }
 
 Light* SceneManager::createLight(const std::string &name) {

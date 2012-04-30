@@ -27,6 +27,13 @@ public:
         void *data = NULL
     );
 
+    Buffer(
+        GLenum bufferType,
+        GLenum accessType,
+        GLenum dataType,
+        unsigned int elementSize
+    );
+
     virtual ~Buffer();
 
     void setData(void *data, int elementCount = 0);
@@ -78,6 +85,7 @@ protected:
 
 private:
     void allocate(int elementCapacity, void *data);
+    void calculateComponentSize();
 
 };
 

@@ -7,6 +7,7 @@
  *
  */
 
+#include <Base/Assertion.h>
 #include "PositionBuffer.h"
 
 PositionBuffer::PositionBuffer(
@@ -26,7 +27,22 @@ PositionBuffer::PositionBuffer(
     )
 {}
 
+PositionBuffer::PositionBuffer(
+    GLenum accessType,
+    GLenum dataType,
+    unsigned int elementSize
+):
+    Buffer(
+        GL_ARRAY_BUFFER,
+        accessType,
+        dataType,
+        elementSize
+    )
+{}
+
 void PositionBuffer::enable() {
+    ASSERT(_handle);
+
     glEnableClientState(GL_VERTEX_ARRAY);
     glBindBuffer(_bufferType, _handle);
 
@@ -36,6 +52,8 @@ void PositionBuffer::enable() {
 }
 
 void PositionBuffer::disable() {
+    ASSERT(_handle);
+
     glDisableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(4, GL_FLOAT, 0, 0);
 }

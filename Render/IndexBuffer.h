@@ -53,6 +53,11 @@ public:
         void *data
     );
 
+    IndexBuffer(
+        GLenum accessType,
+        GLenum dataType
+    );
+
 private:
     friend class RenderOperation;
     void render(PrimitiveType type);

@@ -10,6 +10,7 @@
 #include "Buffer.h"
 
 #include <Base/Assertion.h>
+#include <Base/Math3D.h>
 
 Buffer::Buffer(
     GLenum bufferType,
@@ -29,6 +30,126 @@ Buffer::Buffer(
     _handle(0),
     _byteCount(0)
 {
+    calculateComponentSize();
+    allocate(_elementCount, data);
+}
+
+Buffer::Buffer(
+    GLenum bufferType,
+    GLenum accessType,
+    GLenum dataType,
+    unsigned int elementSize
+):
+    _bufferType(bufferType),
+    _accessType(accessType),
+    _dataType(dataType),
+    _componentsPerElement(elementSize),
+    _elementCount(0),
+    _elementCapacity(0),
+    _bytesPerComponent(0),
+    _handle(0),
+    _byteCount(0)
+{
+    calculateComponentSize();
+}
+
+Buffer::~Buffer() {
+    if (_handle) {
+        glDeleteBuffers(1, &_handle);
+    }
+}
+
+void *Buffer::mapBufferData(GLenum accessType) {
+    if (_handle) {
+        glBindBuffer(_bufferType, _handle);
+        return glMapBuffer(_bufferType, accessType);
+    }
+
+    return NULL;
+}
+
+bool Buffer::unmapBufferData() {
+    bool retVal = false;
+
+    if (_handle) {
+        retVal = glUnmapBuffer(_bufferType);
+        glBindBuffer(_bufferType, 0);
+    }
+
+    return retVal;
+}
+
+void Buffer::setData(void *data, int elementCount) {
+    // Element count defaults to 0 if we're not changing size.
+    if (elementCount) {
+        resize(elementCount, false);
+    }
+
+    ASSERT(_handle);
+
+    glBindBuffer(_bufferType, _handle);
+    glBufferSubData(_bufferType, 0, _byteCount, data);
+    glBindBuffer(_bufferType, 0);
+}
+
+void Buffer::resize(int elementCount, bool saveData) {
+    if (elementCount > _elementCapacity) {
+        reserve(elementCount, saveData);
+    }
+    _elementCount = elementCount;
+}
+
+void Buffer::reserve(int elementCapacity, bool saveData) {
+    if (!_handle) {
+        saveData = false;
+    }
+
+    unsigned char *data = NULL;
+
+    if (saveData) {
+        // We need to create a heap allocation the size of the actual buffer allocation,
+        // but we only want to copy up to the size that is actually used.
+        unsigned int allocSize = _bytesPerComponent * _componentsPerElement * elementCapacity;
+        unsigned int copySize = _bytesPerComponent * _componentsPerElement * _elementCount;
+        data = new unsigned char[allocSize];
+
+        glBindBuffer(_bufferType, _handle);
+        memcpy(data, glMapBuffer(_bufferType, GL_READ_ONLY), Math::Min(allocSize, copySize));
+        ASSERT(glUnmapBuffer(_bufferType));
+        glBindBuffer(_bufferType, 0);
+    }
+
+    allocate(elementCapacity, data);
+
+    if (saveData) {
+        delete[] data;
+        data = NULL;
+    }
+
+    CheckGLErrors();
+}
+
+void Buffer::allocate(int elementCapacity, void *data) {
+    _elementCapacity = elementCapacity;
+
+    if (_elementCapacity < _elementCount) {
+        _elementCount = _elementCapacity;
+    }
+
+    _byteCount = _bytesPerComponent * _componentsPerElement * _elementCapacity;
+
+    if (!_handle) {
+        glGenBuffers(1, &_handle);
+    }
+
+    glBindBuffer(_bufferType, _handle);
+    glBufferData(_bufferType, _byteCount, data, _accessType);
+    glBindBuffer(_bufferType, 0);
+
+    CheckGLErrors();
+}
+
+void Buffer::calculateComponentSize() {
     switch(_dataType) {
         case GL_BYTE:
             // Don't use signed indices. No reason for it.
@@ -61,67 +182,6 @@ Buffer::Buffer(
         default:
             THROW(InvalidStateError, "The specified type is invalid.");
     }
-
-    allocate(_elementCount, data);
-}
-
-Buffer::~Buffer() {
-    glDeleteBuffers(1, &_handle);
-}
-
-void *Buffer::mapBufferData(GLenum accessType) {
-    return glMapBuffer(_handle, accessType);
-}
-
-bool Buffer::unmapBufferData() {
-    return glUnmapBuffer(_handle);
-}
-
-void Buffer::setData(void *data, int elementCount) {
-    if (elementCount) {
-        resize(elementCount, false);
-    }
-
-    glBufferSubData(_handle, 0, _elementCount, data);
-}
-
-void Buffer::resize(int elementCount, bool saveData) {
-    _elementCount = elementCount;
-    if (_elementCount > _elementCapacity) {
-        reserve(_elementCount, saveData);
-    }
-}
-
-void Buffer::reserve(int elementCapacity, bool saveData) {
-    unsigned int oldHandle = _handle;
-    void *data = NULL;
-
-    if (saveData) {
-        data = glMapBuffer(oldHandle, GL_READ_ONLY);
-    }
-
-    allocate(elementCapacity, data);
-
-    if (saveData) {
-        glUnmapBuffer(oldHandle);
-    }
-
-    glDeleteBuffers(1, &oldHandle);
-}
-
-void Buffer::allocate(int elementCapacity, void *data) {
-    _elementCapacity = elementCapacity;
-
-    if (_elementCapacity < _elementCount) {
-        _elementCount = _elementCapacity;
-    }
-
-    _byteCount = _bytesPerComponent * _componentsPerElement * _elementCapacity;
-
-    glGenBuffers(1, &_handle);
-    glBindBuffer(_bufferType, _handle);
-    glBufferData(_bufferType, _byteCount, data, _accessType);
-    glBindBuffer(_bufferType, 0);
 }
 
 GLenum Buffer::getAccessType() {

@@ -20,6 +20,11 @@ public:
         void *data
     );
 
+    NormalBuffer(
+        GLenum accessType,
+        GLenum dataType
+    );
+
     void enable();
 
     void disable();

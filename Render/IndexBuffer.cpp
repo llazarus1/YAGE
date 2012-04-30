@@ -25,6 +25,18 @@ IndexBuffer::IndexBuffer(
     )
 {}
 
+IndexBuffer::IndexBuffer(
+    GLenum accessType,
+    GLenum dataType
+):
+    Buffer(
+        GL_ELEMENT_ARRAY_BUFFER,
+        accessType,
+        dataType,
+        1
+    )
+{}
+
 void IndexBuffer::render(PrimitiveType type) {
     glBindBuffer(_bufferType, _handle);
 
