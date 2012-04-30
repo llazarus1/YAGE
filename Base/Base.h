@@ -16,6 +16,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <set>
 
 typedef float Real;
 

@@ -1,2 +1,0 @@
-vertex=multitexture_terrain.vert
-fragment=multitexture_terrain.frag
