@@ -39,6 +39,7 @@ void SceneNode::addRenderable(Renderable *renderable) {
 #if DEBUG
     renderable->Parent = this;
 #endif
+    renderable->setModelMatrix(_derivedTransform);
     _renderables.push_back(renderable);
 }
 
@@ -99,20 +100,27 @@ void SceneNode::attach(SceneNode *obj) {
     // Drop it in the _children map and set its new parent.
     _children[obj->getName()] = obj;
     obj->_parent = this;
+
+    obj->setDirty();
 }
 
 void SceneNode::dettach(SceneNode *obj) {
     _children.erase(obj->getName());
     obj->_parent = NULL;
+    obj->setDirty();
+    setDirty();
 }
 
 void SceneNode::dettachAllChildren() {
     SceneNodeMap::iterator itr = _children.begin();
     for (; itr != _children.end(); itr++) {
         itr->second->_parent = NULL;
+        itr->second->setDirty();
     }
 
     _children.clear();
+
+    setDirty();
 }
 
 void SceneNode::updateDerivedValues() {
@@ -165,10 +173,11 @@ bool SceneNode::updateImplementationValues() {
 }
 
 void SceneNode::updateBoundingBoxRenderable() {
-    if(_boundingBoxRenderable) { delete _boundingBoxRenderable; }
+    if (_boundingBoxRenderable) { delete _boundingBoxRenderable; _boundingBoxRenderable = NULL; }
+    if (_name == "ROOT" || _type == "Camera") { return; }
 
     RenderOperation *bbOp = RenderOperation::CreateBoxOp(_derivedBoundingBox.getRadius() * 2.0, true);
-    Material *bbMat = Content::GetOrLoad<Material>(_renderables.size() ? "white" : "red");
+    Material *bbMat = Content::GetOrLoad<Material>(_renderables.size() ? "white" : "grey");
     _boundingBoxRenderable = new Renderable(bbOp, bbMat);
 
     _boundingBoxRenderable->setModelMatrix(Matrix::Translation(_derivedBoundingBox.getCenter()));
