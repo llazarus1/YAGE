@@ -87,6 +87,18 @@ void RenderContext::clear(const Color4 &clearColor) {
     CheckGLErrors();
 }
 
+void RenderContext::setFog(const Color4 &color, float density, float fogStartDist, float fogEndDist) {
+    glFogi(GL_FOG_MODE, GL_EXP);
+    glFogfv(GL_FOG_COLOR, color.array);
+    glFogf(GL_FOG_DENSITY, density);
+    glHint(GL_FOG_HINT, GL_NICEST);
+    glFogf(GL_FOG_START, fogStartDist);
+    glFogf(GL_FOG_END, fogEndDist);
+    glEnable(GL_FOG);
+
+    CheckGLErrors();
+}
+
 void RenderContext::setProjectionMatrix(const Matrix &mat) {
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(mat.getMatrix());

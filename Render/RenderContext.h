@@ -31,6 +31,8 @@ public:
 
     void clear(const Color4 &clearColor);
 
+    void setFog(const Color4 &color, float density, float fogStartDist, float fogEndDist);
+
     void render(const Matrix &view, const Matrix &projection, RenderableList &list, LightList &lights);
 
     void render2D(int width, int height, RenderableList &list);
